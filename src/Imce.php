@@ -2,6 +2,9 @@
 
 namespace Drupal\imce;
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\imce\Entity\AggregatedImceProfile;
+use Drupal\imce\Entity\ImceProfileInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -37,38 +40,41 @@ class Imce {
 
   /**
    * Returns imce configuration profile for a user.
+   *
+   * @param \Drupal\Core\Session\AccountProxyInterface|null $user
+   * @param string|null $scheme
+   *
+   * @return ImceProfileInterface
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public static function userProfile(AccountProxyInterface $user = NULL, $scheme = NULL) {
+  public static function userProfile(AccountProxyInterface $user = NULL, $scheme = NULL): ImceProfileInterface {
     $profiles = &drupal_static(__METHOD__, []);
     $user = $user ?: \Drupal::currentUser();
-    $scheme = isset($scheme) ? $scheme : file_default_scheme();
+    $scheme = $scheme ?? file_default_scheme();
     $profile = &$profiles[$user->id()][$scheme];
-
-    if (isset($profile)) {
-      return $profile;
-    }
-    $profile = FALSE;
-
-    if (\Drupal::service('stream_wrapper_manager')->getViaScheme($scheme)) {
-      $storage = \Drupal::entityTypeManager()->getStorage('imce_profile');
-      if ($user->id() == 1 && $profile = $storage->load('admin')) {
-        return $profile;
-      }
-      $imce_settings = \Drupal::config('imce.settings');
-      $roles_profiles = $imce_settings->get('roles_profiles');
-      $user_roles = array_flip($user->getRoles());
-      // Order roles from more permissive to less permissive.
-      $roles = array_reverse(user_roles());
-      foreach ($roles as $rid => $role) {
-        if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme])) {
-          if ($profile = $storage->load($roles_profiles[$rid][$scheme])) {
-            return $profile;
+    if (!isset($profile)) {
+      // Check stream wrapper
+      $aggregate = [];
+      if ($wrapper = \Drupal::service('stream_wrapper_manager')->getViaScheme($scheme)) {
+        $storage = \Drupal::entityTypeManager()->getStorage('imce_profile');
+        if ($user->id() === 1 && $profile = $storage->load('admin')) {
+          return AggregatedImceProfile::createAggregatedImceProfile([$profile]);
+        }
+        $imce_settings = \Drupal::config('imce.settings');
+        $roles_profiles = $imce_settings->get('roles_profiles');
+        $user_roles = array_flip($user->getRoles());
+        // Order roles from more permissive to less permissive.
+        $roles = array_reverse(user_roles());
+        foreach ($roles as $rid => $role) {
+          if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme]) && $profile = $storage->load($roles_profiles[$rid][$scheme])) {
+            $aggregate[] = $profile;
           }
         }
       }
+      $profile = AggregatedImceProfile::createAggregatedImceProfile($aggregate);
     }
-
-    return $profile;
+    return AggregatedImceProfile::createAggregatedImceProfile([$profile]);
   }
 
   /**
@@ -76,21 +82,20 @@ class Imce {
    */
   public static function userConf(AccountProxyInterface $user = NULL, $scheme = NULL) {
     $user = $user ?: \Drupal::currentUser();
-    $scheme = isset($scheme) ? $scheme : file_default_scheme();
+    $scheme = $scheme ?? file_default_scheme();
     if ($profile = static::userProfile($user, $scheme)) {
       $conf = $profile->getConf();
-      $conf['pid'] = $profile->id();
       $conf['scheme'] = $scheme;
       $conf['thumbnail'] = \Drupal::config('imce.settings')->get('thumbnail');
-      return static::processUserConf($conf, $user);
+      return static::processUserConf($conf, $user, $scheme);
     }
   }
 
   /**
    * Processes raw profile configuration of a user.
    */
-  public static function processUserConf(array $conf, AccountProxyInterface $user) {
-    // Convert MB to bytes.
+  public static function processUserConf(array $conf, AccountProxyInterface $user, $scheme) {
+    // Convert MB to bytes
     $conf['maxsize'] *= 1048576;
     $conf['quota'] *= 1048576;
     // Check php max upload size.
@@ -98,9 +103,9 @@ class Imce {
     if ($phpmaxsize && (!$conf['maxsize'] || $phpmaxsize < $conf['maxsize'])) {
       $conf['maxsize'] = $phpmaxsize;
     }
-    // Set root uri and url.
-    $conf['root_uri'] = $conf['scheme'] . '://';
-    // file_create_url requires a filepath for some schemes like private:// .
+    // Set root uri and url
+    $conf['root_uri'] = $scheme . '://';
+    // file_create_url requires a filepath for some schemes like private://
     $conf['root_url'] = preg_replace('@/(?:%2E|\.)$@i', '', file_create_url($conf['root_uri'] . '.'));
     // Convert to relative.
     if (!\Drupal::config('imce.settings')->get('abs_urls')) {

@@ -32,7 +32,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   }
  * )
  */
-class ImceProfile extends ConfigEntityBase {
+class ImceProfile extends ConfigEntityBase implements ImceProfileInterface{
 
   /**
    * Profile ID.
