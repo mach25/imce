@@ -32,7 +32,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   }
  * )
  */
-class ImceProfile extends ConfigEntityBase implements ImceProfileInterface{
+class ImceProfile extends ConfigEntityBase implements ImceProfileInterface {
 
   /**
    * Profile ID.
@@ -64,11 +64,16 @@ class ImceProfile extends ConfigEntityBase implements ImceProfileInterface{
 
   /**
    * Returns configuration options.
+   *
+   * @param null $key
+   * @param null $default
+   *
+   * @return array|mixed|null
    */
   public function getConf($key = NULL, $default = NULL) {
     $conf = $this->conf;
     if (isset($key)) {
-      return isset($conf[$key]) ? $conf[$key] : $default;
+      return $conf[$key] ?? $default;
     }
     return $conf;
   }
