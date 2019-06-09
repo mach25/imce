@@ -122,7 +122,7 @@ class Imce {
   /**
    * Processes user folders.
    */
-  public static function processUserFolders(array $folders, AccountProxyInterface $user) {
+  public static function processUserFolders(array $folders = [], AccountProxyInterface $user = NULL) {
     $ret = [];
     $token_service = \Drupal::token();
     $meta = new BubbleableMetadata();
