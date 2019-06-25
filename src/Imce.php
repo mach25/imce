@@ -2,6 +2,7 @@
 
 namespace Drupal\imce;
 
+use Drupal\Component\Utility\Environment;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\imce\Entity\AggregatedImceProfile;
 use Drupal\imce\Entity\ImceProfileInterface;
@@ -67,8 +68,11 @@ class Imce {
         // Order roles from more permissive to less permissive.
         $roles = array_reverse(user_roles());
         foreach ($roles as $rid => $role) {
-          if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme]) && $profile = $storage->load($roles_profiles[$rid][$scheme])) {
-            $aggregate[] = $profile;
+          if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme])) {
+            $profile = $storage->load($roles_profiles[$rid][$scheme]);
+            if ($profile) {
+              $aggregate[] = $profile;
+            }
           }
         }
       }
@@ -79,6 +83,13 @@ class Imce {
 
   /**
    * Returns processed profile configuration for a user.
+   *
+   * @param \Drupal\Core\Session\AccountProxyInterface|null $user
+   * @param null $scheme
+   *
+   * @return array
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public static function userConf(AccountProxyInterface $user = NULL, $scheme = NULL) {
     $user = $user ?: \Drupal::currentUser();
@@ -99,7 +110,7 @@ class Imce {
     $conf['maxsize'] *= 1048576;
     $conf['quota'] *= 1048576;
     // Check php max upload size.
-    $phpmaxsize = file_upload_max_size();
+    $phpmaxsize = Environment::getUploadMaxSize();
     if ($phpmaxsize && (!$conf['maxsize'] || $phpmaxsize < $conf['maxsize'])) {
       $conf['maxsize'] = $phpmaxsize;
     }
@@ -113,7 +124,7 @@ class Imce {
     }
     $conf['token'] = $user->isAnonymous() ? 'anon' : \Drupal::csrfToken()->get('imce');
     // Process folders.
-    $conf['folders'] = static::processUserFolders($conf['folders'], $user);
+    $conf['folders'] = static::processUserFolders($conf['folders'] ?? [], $user);
     // Call plugin processors.
     \Drupal::service('plugin.manager.imce.plugin')->processUserConf($conf, $user);
     return $conf;
@@ -121,8 +132,16 @@ class Imce {
 
   /**
    * Processes user folders.
+   *
+   * @param array $folders
+   * @param \Drupal\Core\Session\AccountProxyInterface|null $user
+   *
+   * @return array
    */
-  public static function processUserFolders(array $folders = [], AccountProxyInterface $user = NULL) {
+  public static function processUserFolders(array $folders = [], AccountProxyInterface $user = NULL): array {
+    if ($user === NULL) {
+      $user = \Drupal::currentUser();
+    }
     $ret = [];
     $token_service = \Drupal::token();
     $meta = new BubbleableMetadata();
@@ -250,8 +269,8 @@ class Imce {
    */
   public static function scanDir($diruri, array $options = []) {
     $content = ['files' => [], 'subfolders' => []];
-    $browse_files = isset($options['browse_files']) ? $options['browse_files'] : TRUE;
-    $browse_subfolders = isset($options['browse_subfolders']) ? $options['browse_subfolders'] : TRUE;
+    $browse_files = $options['browse_files'] ?? TRUE;
+    $browse_subfolders = $options['browse_subfolders'] ?? TRUE;
     if (!$browse_files && !$browse_subfolders) {
       return $content;
     }

@@ -14,7 +14,14 @@ class AggregatedImceProfile implements ImceProfileInterface {
    * @param array $profiles
    */
   private function __construct(array $profiles = []) {
-    $this->profiles = array_filter($profiles, 'isset');
+    $this->profiles = array_filter($profiles, static function (...$props) {
+      foreach ($props as $prop) {
+        if (!isset($prop)) {
+          return false;
+        }
+      }
+      return true;
+    });
   }
 
 
@@ -24,7 +31,7 @@ class AggregatedImceProfile implements ImceProfileInterface {
 
   public function getConf($key = NULL, $default = NULL) {
     // Map the original profile configurations
-    $confs = array_map(function (ImceProfileInterface $profile) use ($key, $default) {
+    $confs = array_map(static function (ImceProfileInterface $profile) use ($key, $default) {
       return $profile->getConf($key, $default);
     }, $this->profiles);
 

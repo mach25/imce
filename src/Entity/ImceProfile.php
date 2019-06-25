@@ -72,7 +72,7 @@ class ImceProfile extends ConfigEntityBase implements ImceProfileInterface {
    */
   public function getConf($key = NULL, $default = NULL) {
     $conf = $this->conf;
-    if (isset($key)) {
+    if ($key !== NULL) {
       return $conf[$key] ?? $default;
     }
     return $conf;

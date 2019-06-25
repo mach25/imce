@@ -460,7 +460,7 @@ class ImceFM {
     if (preg_match('/\.(jpe?g|png|gif)$/i', $uri) && $info = getimagesize($uri)) {
       $properties['width'] = $info[0];
       $properties['height'] = $info[1];
-      if (substr_count($uri, 'styles/imce_thumbnail') < 1) {
+      if ($this->style !== NULL && (substr_count($uri, 'styles/imce_thumbnail') < 1)) {
         $properties['thumbnail'] = $this->style->buildUrl($uri);
       }
       $properties['uri'] = $uri;
