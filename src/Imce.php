@@ -3,6 +3,9 @@
 namespace Drupal\imce;
 
 use Drupal\Component\Utility\Environment;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\imce\Entity\AggregatedImceProfile;
+use Drupal\imce\Entity\ImceProfileInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -39,42 +42,56 @@ class Imce {
 
   /**
    * Returns imce configuration profile for a user.
+   *
+   * @param \Drupal\Core\Session\AccountProxyInterface|null $user
+   * @param string|null $scheme
+   *
+   * @return ImceProfileInterface
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public static function userProfile(AccountProxyInterface $user = NULL, $scheme = NULL) {
+  public static function userProfile(AccountProxyInterface $user = NULL, $scheme = NULL): ImceProfileInterface {
     $profiles = &drupal_static(__METHOD__, []);
     $user = $user ?: \Drupal::currentUser();
     $scheme = isset($scheme) ? $scheme : \Drupal::config('system.file')->get('default_scheme');
     $profile = &$profiles[$user->id()][$scheme];
 
-    if (isset($profile)) {
-      return $profile;
-    }
-    $profile = FALSE;
-
-    if (\Drupal::service('stream_wrapper_manager')->getViaScheme($scheme)) {
-      $storage = \Drupal::entityTypeManager()->getStorage('imce_profile');
-      if ($user->id() == 1 && $profile = $storage->load('admin')) {
-        return $profile;
-      }
-      $imce_settings = \Drupal::config('imce.settings');
-      $roles_profiles = $imce_settings->get('roles_profiles');
-      $user_roles = array_flip($user->getRoles());
-      // Order roles from more permissive to less permissive.
-      $roles = array_reverse(user_roles());
-      foreach ($roles as $rid => $role) {
-        if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme])) {
-          if ($profile = $storage->load($roles_profiles[$rid][$scheme])) {
-            return $profile;
+    if (!isset($profile)) {
+      $profile = FALSE;
+      $aggregate = [];
+      if (\Drupal::service('stream_wrapper_manager')->getViaScheme($scheme)) {
+        $storage = \Drupal::entityTypeManager()->getStorage('imce_profile');
+        if ($user->id() === 1 && $profile = $storage->load('admin')) {
+          return AggregatedImceProfile::createAggregatedImceProfile([$profile]);
+        }
+        $imce_settings = \Drupal::config('imce.settings');
+        $roles_profiles = $imce_settings->get('roles_profiles');
+        $user_roles = array_flip($user->getRoles());
+        // Order roles from more permissive to less permissive.
+        $roles = array_reverse(user_roles());
+        foreach ($roles as $rid => $role) {
+          if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme])) {
+            if ($profile = $storage->load($roles_profiles[$rid][$scheme])) {
+              $aggregate[] = $profile;
+            }
           }
         }
       }
+      $profile = AggregatedImceProfile::createAggregatedImceProfile($aggregate);
     }
 
-    return $profile;
+    return AggregatedImceProfile::createAggregatedImceProfile([$profile]);
   }
 
   /**
    * Returns processed profile configuration for a user.
+   *
+   * @param \Drupal\Core\Session\AccountProxyInterface|null $user
+   * @param null $scheme
+   *
+   * @return array
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public static function userConf(AccountProxyInterface $user = NULL, $scheme = NULL) {
     $user = $user ?: \Drupal::currentUser();
@@ -117,8 +134,16 @@ class Imce {
 
   /**
    * Processes user folders.
+   *
+   * @param array $folders
+   * @param \Drupal\Core\Session\AccountProxyInterface|null $user
+   *
+   * @return array
    */
-  public static function processUserFolders(array $folders, AccountProxyInterface $user) {
+  public static function processUserFolders(array $folders = [], AccountProxyInterface $user = NULL): array {
+    if ($user === NULL) {
+      $user = \Drupal::currentUser();
+    }
     $ret = [];
     $token_service = \Drupal::token();
     $meta = new BubbleableMetadata();
@@ -345,7 +370,7 @@ class Imce {
    * Checks if a file uri is accessible by a user with Imce.
    */
   public static function accessFileUri($uri, AccountProxyInterface $user = NULL) {
-    list($scheme, $path) = explode('://', $uri, 2);
+    [$scheme, $path] = explode('://', $uri, 2);
     return $scheme && $path && Imce::accessFilePaths([$path], $user, $scheme);
   }
 
