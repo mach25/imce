@@ -1,5 +1,5 @@
 {
-    "name": "drupal/imce",
+    "name": "mach25/imce",
     "description": "Provides a file manager supporting personal folders.",
     "type": "drupal-module",
     "minimum-stability": "dev",
