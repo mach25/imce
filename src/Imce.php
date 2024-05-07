@@ -347,8 +347,11 @@ class Imce {
   public static function accessFilePaths(array $paths, AccountProxyInterface $user = NULL, $scheme = NULL) {
     $ret = [];
     if ($fm = static::userFM($user, $scheme)) {
+      $filter = $fm->getNameFilter();
       foreach ($paths as $path) {
-        if ($fm->checkFile($path)) {
+        $parts = static::splitPath($path);
+        $folder = $parts ? $fm->checkFolder($parts[0]) : NULL;
+        if ($folder && $folder->getPermission('browse_files') && static::validateFileName($parts[1], $filter) && is_file($fm->createUri($path))) {
           $ret[] = $path;
         }
       }
