@@ -123,7 +123,7 @@ class ImceFileField implements TrustedCallbackInterface {
     foreach ($paths as $path) {
       // Get entity by uri.
       $file = Imce::getFileEntity($element['#scheme'] . '://' . $path, TRUE);
-      if ($new_errors = file_validate($file, $element['#upload_validators'])) {
+      if ($new_errors = Imce::runValidators($file, $element['#upload_validators'])) {
         $errors = array_merge($errors, $new_errors);
       }
       else {

@@ -4,6 +4,8 @@ namespace Drupal\imce;
 
 use Drupal\Component\Utility\Environment;
 use Drupal\user\Entity\User;
+use Drupal\user\Entity\Role;
+use Drupal\file\FileInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -60,7 +62,7 @@ class Imce {
       $roles_profiles = $imce_settings->get('roles_profiles');
       $user_roles = array_flip($user->getRoles());
       // Order roles from more permissive to less permissive.
-      $roles = array_reverse(user_roles());
+      $roles = array_reverse(Role::loadMultiple());
       foreach ($roles as $rid => $role) {
         if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme])) {
           if ($profile = $storage->load($roles_profiles[$rid][$scheme])) {
@@ -92,8 +94,8 @@ class Imce {
    */
   public static function processUserConf(array $conf, AccountProxyInterface $user) {
     // Convert MB to bytes.
-    $conf['maxsize'] *= 1048576;
-    $conf['quota'] *= 1048576;
+    $conf['maxsize'] = (int) ((float) $conf['maxsize'] * 1048576);
+    $conf['quota'] = (int) ((float) $conf['quota'] * 1048576);
     // Check php max upload size.
     $phpmaxsize = Environment::getUploadMaxSize();
     if ($phpmaxsize && (!$conf['maxsize'] || $phpmaxsize < $conf['maxsize'])) {
@@ -387,6 +389,32 @@ class Imce {
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * Runs file validators and returns errors.
+   */
+  public static function runValidators(FileInterface $file, $validators = []) {
+    if (!\Drupal::hasService('file.validator')) {
+      $func = 'file_validate';
+      return $func($file, $validators);
+    }
+    $errors = [];
+    foreach (\Drupal::service('file.validator')->validate($file, $validators) as $violation) {
+      $errors[] = $violation->getMessage();
+    }
+    return $errors;
+  }
+
+  /**
+   * Formats file size.
+   */
+  public static function formatSize($size) {
+    $func = 'Drupal\Core\StringTranslation\ByteSizeMarkup::create';
+    if (!is_callable($func)) {
+      $func = 'format_size';
+    }
+    return $func($size);
   }
 
 }

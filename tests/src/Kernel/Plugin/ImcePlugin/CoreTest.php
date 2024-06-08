@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class CoreTest extends KernelTestBasePlugin {
 
   /**
-   * The Imce ckeditor plugin.
+   * The Imce Core plugin.
    *
    * @var \Drupal\imce\Plugin\ImcePlugin\Core
    */

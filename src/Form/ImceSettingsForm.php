@@ -9,6 +9,7 @@ use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\Url;
 use Drupal\imce\ImceSettersTrait;
 use Drupal\user\RoleInterface;
+use Drupal\user\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -183,7 +184,7 @@ class ImceSettingsForm extends ConfigFormBase {
   public function buildRolesProfilesTable(array $roles_profiles) {
     $rp_table = ['#type' => 'table'];
 
-    $roles = user_roles();
+    $roles = Role::loadMultiple();
     $wrappers = $this->streamWrapperManager->getNames(StreamWrapperInterface::WRITE_VISIBLE);
 
     $imce_url = Url::fromRoute('imce.page')->toString();

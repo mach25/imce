@@ -21,7 +21,7 @@ class ResizeTest extends KernelTestBasePlugin {
   use StringTranslationTrait;
 
   /**
-   * The Imce ckeditor plugin.
+   * The Imce Resize plugin.
    *
    * @var \Drupal\imce\Plugin\ImcePlugin\Resize
    */

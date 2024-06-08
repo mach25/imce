@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class DeleteTest extends KernelTestBasePlugin {
 
   /**
-   * The Imce ckeditor plugin.
+   * The Imce Delete plugin.
    *
    * @var \Drupal\imce\Plugin\ImcePlugin\Delete
    */

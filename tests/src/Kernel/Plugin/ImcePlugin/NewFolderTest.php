@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class NewFolderTest extends KernelTestBasePlugin {
 
   /**
-   * The Imce ckeditor plugin.
+   * The Imce Newfolder plugin.
    *
    * @var \Drupal\imce\Plugin\ImcePlugin\Newfolder
    */

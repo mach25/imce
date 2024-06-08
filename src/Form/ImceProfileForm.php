@@ -119,7 +119,7 @@ class ImceProfileForm extends EntityForm {
       '#size' => 8,
       '#title' => $this->t('Maximum file size'),
       '#default_value' => $imce_profile->getConf('maxsize'),
-      '#description' => $this->t('Maximum allowed file size per upload.') . ' ' . $this->t('Your PHP settings limit the upload size to %size.', ['%size' => format_size($maxsize)]),
+      '#description' => $this->t('Maximum allowed file size per upload.') . ' ' . $this->t('Your PHP settings limit the upload size to %size.', ['%size' => Imce::formatSize($maxsize)]),
       '#field_suffix' => $this->t('MB'),
       '#weight' => -8,
     ];
