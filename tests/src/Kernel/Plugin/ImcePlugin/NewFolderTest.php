@@ -46,7 +46,7 @@ class NewFolderTest extends KernelTestBasePlugin {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() : void {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->imceFM = $this->getImceFM();
@@ -114,7 +114,8 @@ class NewFolderTest extends KernelTestBasePlugin {
    */
   public function testFolderCreate() {
     $uriFolder = Imce::joinPaths(
-      $this->imceFM->activeFolder->getUri(), $this->imceFM->getPost('newfolder')
+      $this->imceFM->activeFolder->getUri(),
+      $this->imceFM->getPost('newfolder'),
     );
 
     $this->assertIsString($uriFolder);

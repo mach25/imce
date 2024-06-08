@@ -2,9 +2,9 @@
 
 namespace Drupal\imce\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\Constraint;
 use Drupal\file\Plugin\Validation\Constraint\BaseFileConstraintValidator;
 use Drupal\imce\Imce;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * Validates imce file name constaint.

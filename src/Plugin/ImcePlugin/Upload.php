@@ -3,8 +3,8 @@
 namespace Drupal\imce\Plugin\ImcePlugin;
 
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\imce\ImcePluginBase;
 use Drupal\imce\ImceFM;
+use Drupal\imce\ImcePluginBase;
 
 /**
  * Defines Imce Upload plugin.
@@ -83,7 +83,8 @@ class Upload extends ImcePluginBase {
       }
     }
     // Save files.
-    if ($files = file_save_upload('imce', $validators, $destination, NULL, $replace)) {
+    $files = file_save_upload('imce', $validators, $destination, NULL, $replace);
+    if ($files) {
       $fs = \Drupal::service('file_system');
       foreach (array_filter($files) as $file) {
         // Set status and save.

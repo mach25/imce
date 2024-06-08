@@ -3,8 +3,8 @@
 namespace Drupal\imce\Plugin\ImcePlugin;
 
 use Drupal\imce\Imce;
-use Drupal\imce\ImcePluginBase;
 use Drupal\imce\ImceFM;
+use Drupal\imce\ImcePluginBase;
 
 /**
  * Defines Imce Resize plugin.
@@ -55,7 +55,10 @@ class Resize extends ImcePluginBase {
    * Validates item resizing.
    */
   public function validateResize(ImceFM $fm, array $items, $width, $height, $copy) {
-    return $items && $fm->validateDimensions($items, $width, $height) && $fm->validateImageTypes($items) && $fm->validatePermissions($items, 'resize_images');
+    return $items
+      && $fm->validateDimensions($items, $width, $height)
+      && $fm->validateImageTypes($items)
+      && $fm->validatePermissions($items, 'resize_images');
   }
 
   /**
@@ -97,7 +100,7 @@ class Resize extends ImcePluginBase {
           'filesize' => $filesize,
           'filemime' => $image->getMimeType(),
         ];
-        /** @var \Drupal\file\FileStorage */
+        /** @var \Drupal\file\FileStorage $storage */
         $storage = \Drupal::entityTypeManager()->getStorage('file');
         $file = $storage->create($values);
         // Check quota.
@@ -117,7 +120,8 @@ class Resize extends ImcePluginBase {
       }
       // Update existing.
       else {
-        if ($file = Imce::getFileEntity($uri)) {
+        $file = Imce::getFileEntity($uri);
+        if ($file) {
           $file->setSize($filesize);
           $file->save();
         }
