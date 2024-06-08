@@ -72,7 +72,7 @@ class Delete extends ImcePluginBase {
           ? $this->deleteFolderUri(
               $uri,
               $ignore_usage,
-              !$item->getPermission('delete_files'),
+              !$item->getPermission('delete_files')
             )
           : $this->deleteFileUri($uri, $ignore_usage);
         if ($result) {
@@ -99,7 +99,7 @@ class Delete extends ImcePluginBase {
           if ($usage) {
             \Drupal::messenger()->addMessage(t(
               '%filename is in use by another application.',
-              ['%filename' => $file->getFilename()],
+              ['%filename' => $file->getFilename()]
             ), 'error');
             return FALSE;
           }
@@ -124,7 +124,7 @@ class Delete extends ImcePluginBase {
     if ($check_files && !empty($content['files'])) {
       \Drupal::messenger()->addMessage(t(
         '%folder contains files and can not be deleted.',
-        ['%folder' => \Drupal::service('file_system')->basename($uri)],
+        ['%folder' => \Drupal::service('file_system')->basename($uri)]
       ), 'error');
       return FALSE;
     }

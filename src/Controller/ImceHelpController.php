@@ -45,7 +45,7 @@ class ImceHelpController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('current_route_match'),
-      $container->get('extension.list.module'),
+      $container->get('extension.list.module')
     );
   }
 

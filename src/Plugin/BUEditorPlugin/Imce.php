@@ -55,7 +55,7 @@ class Imce extends BUEditorPluginBase {
       'content' => [
         '#markup' => $this->t(
           'Configure <a href=":url">Imce File Manager</a>.',
-          [':url' => Url::fromRoute('imce.admin')->toString()],
+          [':url' => Url::fromRoute('imce.admin')->toString()]
         ),
       ],
     ];

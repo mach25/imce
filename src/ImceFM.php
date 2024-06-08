@@ -605,7 +605,7 @@ class ImceFM {
         if (!$silent) {
           $this->setMessage($this->t(
             '%path is a predefined path and can not be modified.',
-            ['%path' => $folder->getPath()],
+            ['%path' => $folder->getPath()]
           ));
         }
         return FALSE;
@@ -645,7 +645,7 @@ class ImceFM {
       if (!$silent) {
         $this->setMessage($this->t(
           'Image dimensions must be smaller than %dimensions pixels.',
-          ['%dimensions' => $maxwidth . 'x' . $maxwidth],
+          ['%dimensions' => $maxwidth . 'x' . $maxwidth]
         ));
       }
       return FALSE;
@@ -743,7 +743,7 @@ class ImceFM {
       $page,
       $this->t('File manager'),
       'imce_page',
-      ['#show_messages' => FALSE],
+      ['#show_messages' => FALSE]
     )->getContent();
   }
 

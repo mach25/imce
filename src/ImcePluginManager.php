@@ -47,14 +47,14 @@ class ImcePluginManager extends DefaultPluginManager {
   public function __construct(
     \Traversable $namespaces,
     CacheBackendInterface $cache_backend,
-    ModuleHandlerInterface $module_handler,
+    ModuleHandlerInterface $module_handler
   ) {
     parent::__construct(
       'Plugin/ImcePlugin',
       $namespaces,
       $module_handler,
       'Drupal\imce\ImcePluginInterface',
-      'Drupal\imce\Annotation\ImcePlugin',
+      'Drupal\imce\Annotation\ImcePlugin'
     );
     $this->alterInfo('imce_plugin_info');
     $this->setCacheBackend($cache_backend, 'imce_plugins');

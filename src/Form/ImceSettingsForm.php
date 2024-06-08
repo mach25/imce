@@ -89,7 +89,7 @@ class ImceSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Use admin theme for IMCE paths'),
       '#default_value' => $config->get('admin_theme'),
       '#description' => $this->t(
-        'If you have user interface issues with the active theme you may consider switching to admin theme.',
+        'If you have user interface issues with the active theme you may consider switching to admin theme.'
       ),
     ];
     $form['#attached']['library'][] = 'imce/drupal.imce.admin';
@@ -118,7 +118,7 @@ class ImceSettingsForm extends ConfigFormBase {
     // Warn about anonymous access.
     if (!empty($roles_profiles[RoleInterface::ANONYMOUS_ID])) {
       $this->messenger()->addMessage($this->t(
-        'You have enabled anonymous access to the file manager. Please make sure this is not a misconfiguration.',
+        'You have enabled anonymous access to the file manager. Please make sure this is not a misconfiguration.'
       ), 'warning');
     }
     parent::submitForm($form, $form_state);
@@ -195,14 +195,14 @@ class ImceSettingsForm extends ConfigFormBase {
     // Add description.
     $rp_table['#prefix'] = '<h3>' . $this->t('Role-profile assignments') . '</h3>';
     $desc = $this->t(
-      'Assign configuration profiles to user roles for available file systems. Users with multiple roles get the bottom most profile.',
+      'Assign configuration profiles to user roles for available file systems. Users with multiple roles get the bottom most profile.'
     );
     $desc .= ' ' . $this->t(
       'The default file system %name is accessible at :url path.',
       [
         '%name' => $wrappers[$this->configSystemFile->get('default_scheme')],
         ':url' => $imce_url,
-      ],
+      ]
     );
     $rp_table['#suffix'] = '<div class="description">' . $desc . '</div>';
     return $rp_table;

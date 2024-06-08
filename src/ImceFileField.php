@@ -49,7 +49,7 @@ class ImceFileField implements TrustedCallbackInterface {
         '#type' => 'checkbox',
         '#title' => t(
           'Allow users to select files from <a href=":url">Imce File Manager</a> for this field.',
-          [':url' => Url::fromRoute('imce.admin')->toString()],
+          [':url' => Url::fromRoute('imce.admin')->toString()]
         ),
         '#default_value' => $widget->getThirdPartySetting('imce', 'enabled'),
       ];

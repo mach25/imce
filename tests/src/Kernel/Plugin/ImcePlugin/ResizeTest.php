@@ -95,7 +95,7 @@ class ResizeTest extends KernelTestBasePlugin {
     $this->imceFM->selection[] = $this->imceFM->createItem(
       'file',
       'ciandt.jpg',
-      ['path' => '.'],
+      ['path' => '.']
     );
     // $this->imceFM->getConf()
     $this->imceFM->selection[0]->parent = new ImceFolder('.', $this->getConf());

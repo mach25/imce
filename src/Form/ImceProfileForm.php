@@ -37,7 +37,7 @@ class ImceProfileForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.imce.plugin'),
+      $container->get('plugin.manager.imce.plugin')
     );
   }
 
@@ -114,7 +114,7 @@ class ImceProfileForm extends EntityForm {
     $desc = $this->t('Maximum allowed file size per upload.');
     $desc .= ' ' . $this->t(
       'Your PHP settings limit the upload size to %size.',
-      ['%size' => Imce::formatSize($maxsize)],
+      ['%size' => Imce::formatSize($maxsize)]
     );
     $conf['maxsize'] = [
       '#type' => 'number',
@@ -202,7 +202,7 @@ class ImceProfileForm extends EntityForm {
         '#options' => image_style_options(),
         '#default_value' => $imce_profile->getConf('thumbnail_style'),
         '#description' => $this->t(
-          'Select a thumbnail style from the list to make the file browser display inline image previews. Note that this could reduce the performance of the file browser drastically.',
+          'Select a thumbnail style from the list to make the file browser display inline image previews. Note that this could reduce the performance of the file browser drastically.'
         ),
       ];
       $conf['advanced']['thumbnail_grid_style'] = [
@@ -210,7 +210,7 @@ class ImceProfileForm extends EntityForm {
         '#title' => $this->t('Thumbnail grid style'),
         '#default_value' => $imce_profile->getConf('thumbnail_grid_style'),
         '#description' => $this->t(
-          'Check it if you want to display the thumbnail in a grid. If not checked it will display the thumbnail in a list.',
+          'Check it if you want to display the thumbnail in a grid. If not checked it will display the thumbnail in a list.'
         ),
       ];
     }
@@ -219,7 +219,7 @@ class ImceProfileForm extends EntityForm {
       '#title' => $this->t('Ignore file usage.'),
       '#default_value' => $imce_profile->getConf('ignore_usage'),
       '#description' => $this->t(
-        'IMCE avoids deletion or overwriting of files that are in use by other Drupal modules. Enabling this option skips the file usage check. Not recommended!',
+        'IMCE avoids deletion or overwriting of files that are in use by other Drupal modules. Enabling this option skips the file usage check. Not recommended!'
       ),
     ];
     $conf['advanced']['url_alter'] = [
@@ -227,14 +227,14 @@ class ImceProfileForm extends EntityForm {
       '#title' => $this->t('Enable URL altering'),
       '#default_value' => $imce_profile->getConf('url_alter'),
       '#description' => $this->t(
-        'IMCE builds file URLs on js side by combining the root URL and file paths. This might result in incorrect URLs for some file systems like s3. This option should fix the URLs at the cost of some performance degredation.',
+        'IMCE builds file URLs on js side by combining the root URL and file paths. This might result in incorrect URLs for some file systems like s3. This option should fix the URLs at the cost of some performance degredation.'
       ),
     ];
 
     // Folders.
     $desc = $this->t(
       'You can use user tokens in folder paths, e.g. @tokens.',
-      ['@tokens' => '[user:uid], [user:name]'],
+      ['@tokens' => '[user:uid], [user:name]']
     );
     $desc .= ' ' . $this->t('Subfolders inherit parent permissions when subfolder browsing is enabled.');
     $conf['folders'] = [
