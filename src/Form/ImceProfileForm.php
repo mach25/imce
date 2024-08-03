@@ -4,7 +4,6 @@ namespace Drupal\imce\Form;
 
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\imce\Imce;
 use Drupal\imce\ImcePluginManager;
@@ -185,11 +184,11 @@ class ImceProfileForm extends EntityForm {
     $conf['advanced']['replace'] = [
       '#type' => 'radios',
       '#title' => $this->t('Upload replace method'),
-      '#default_value' => $imce_profile->getConf('replace', FileSystemInterface::EXISTS_RENAME),
+      '#default_value' => $imce_profile->getConf('replace', 0),
       '#options' => [
-        FileSystemInterface::EXISTS_RENAME => $this->t('Keep the existing file renaming the new one'),
-        FileSystemInterface::EXISTS_REPLACE => $this->t('Replace the existing file with the new one'),
-        FileSystemInterface::EXISTS_ERROR => $this->t('Keep the existing file rejecting the new one'),
+        0 => $this->t('Keep the existing file renaming the new one'),
+        1 => $this->t('Replace the existing file with the new one'),
+        2 => $this->t('Keep the existing file rejecting the new one'),
       ],
       '#description' => $this->t('Select the replace method for existing files during uploads.'),
       '#weight' => -5,
