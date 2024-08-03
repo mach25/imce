@@ -227,7 +227,7 @@ class ImceProfileForm extends EntityForm {
       '#title' => $this->t('Enable URL altering'),
       '#default_value' => $imce_profile->getConf('url_alter'),
       '#description' => $this->t(
-        'IMCE builds file URLs on js side by combining the root URL and file paths. This might result in incorrect URLs for some file systems like s3. This option should fix the URLs at the cost of some performance degredation.'
+        'IMCE builds file URLs on js side by combining the root URL and file paths. This might result in incorrect URLs for some file systems like s3. This option should fix the URLs at the cost of some performance degradation.'
       ),
     ];
 
