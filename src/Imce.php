@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\file\FileInterface;
+use Drupal\imce\Entity\AggregatedImceProfile;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,6 +60,7 @@ class Imce {
       if ($user->id() == 1) {
         $profile = $storage->load('admin');
         if ($profile) {
+          $profiles[$user->id()][$scheme] = $profile;
           return $profile;
         }
       }
@@ -67,15 +69,17 @@ class Imce {
       $user_roles = array_flip($user->getRoles());
       // Order roles from more permissive to less permissive.
       $roles = array_reverse(Role::loadMultiple());
+      $aggregate = [];
       foreach ($roles as $rid => $role) {
-        if (!isset($user_roles[$rid]) || empty($roles_profiles[$rid][$scheme])) {
-          continue;
-        }
-        $profile = $storage->load($roles_profiles[$rid][$scheme]);
-        if ($profile) {
-          return $profile;
+        if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme])) {
+          if ($profile = $storage->load($roles_profiles[$rid][$scheme])) {
+            $aggregate[] = $profile;
+          }
         }
       }
+      $aggregate_profile =  AggregatedImceProfile::createAggregatedImceProfile($aggregate);
+      $profiles[$user->id()][$scheme] = $aggregate_profile;
+      return $aggregate_profile;
     }
 
     return $profile;
