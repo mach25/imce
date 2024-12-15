@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\file\FileInterface;
+use Drupal\imce\Entity\AggregatedImceProfile;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,6 +58,8 @@ class Imce {
     if (static::service('stream_wrapper_manager')->getViaScheme($scheme)) {
       $storage = static::entityStorage('imce_profile');
       if ($user->id() == 1) {
+        // $profile is a reference into the $profiles static, so this assignment
+        // already caches the result.
         $profile = $storage->load('admin');
         if ($profile) {
           return $profile;
@@ -67,15 +70,27 @@ class Imce {
       $user_roles = array_flip($user->getRoles());
       // Order roles from more permissive to less permissive.
       $roles = array_reverse(Role::loadMultiple());
+      // Collect *every* matching role profile rather than returning the first, so
+      // that a member of several groups gets access to all of their folders. Use a
+      // local variable: $profile is a reference into the static cache, and assigning
+      // to it inside the loop would publish half-built state to other callers.
+      $aggregate = [];
       foreach ($roles as $rid => $role) {
-        if (!isset($user_roles[$rid]) || empty($roles_profiles[$rid][$scheme])) {
-          continue;
-        }
-        $profile = $storage->load($roles_profiles[$rid][$scheme]);
-        if ($profile) {
-          return $profile;
+        if (isset($user_roles[$rid]) && !empty($roles_profiles[$rid][$scheme])) {
+          if ($role_profile = $storage->load($roles_profiles[$rid][$scheme])) {
+            $aggregate[] = $role_profile;
+          }
         }
       }
+      // Only substitute an aggregate when there is something to aggregate.
+      // Upstream leaves $profile === FALSE when no role profile matches, and
+      // Imce::access() is just (bool) userProfile() — /imce/{scheme} has no other
+      // access requirement. Returning an empty aggregate here is truthy and grants
+      // the file manager to every visitor, anonymous included.
+      if ($aggregate) {
+        $profile = AggregatedImceProfile::createAggregatedImceProfile($aggregate);
+      }
+      return $profile;
     }
 
     return $profile;
