@@ -229,6 +229,15 @@ class ImceProfileForm extends EntityForm {
         'IMCE builds file URLs on js side by combining the root URL and file paths. This might result in incorrect URLs for some file systems like s3. This option should fix the URLs at the cost of some performance degradation.'
       ),
     ];
+    $conf['advanced']['image_extensions'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Image extensions'),
+      '#default_value' => $imce_profile->getConf('image_extensions', 'jpg jpeg png gif webp'),
+      '#maxlength' => 255,
+      '#description' => $this->t(
+        'Files with these extensions will be treated as images. Leaving this field empty disables image handling, which may fix performance issues with folders containing too many images, especially under remote file systems like S3.'
+      ),
+    ];
 
     // Folders.
     $desc = $this->t(
