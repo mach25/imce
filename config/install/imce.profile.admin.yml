@@ -20,3 +20,4 @@ conf:
       permissions:
         all: true
 langcode: en
+status: true
