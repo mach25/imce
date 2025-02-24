@@ -86,6 +86,10 @@ imce.profile_conf.image_extensions:
   type: string
   label: 'Image extensions'
 
+imce.profile_conf.lazy_dimensions:
+  type: boolean
+  label: 'Lazy image dimensions'
+
 imce.profile_conf.folders:
   type: sequence
   label: 'Folders'

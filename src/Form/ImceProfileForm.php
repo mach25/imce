@@ -234,8 +234,14 @@ class ImceProfileForm extends EntityForm {
       '#title' => $this->t('Image extensions'),
       '#default_value' => $imce_profile->getConf('image_extensions', 'jpg jpeg png gif webp'),
       '#maxlength' => 255,
+      '#description' => $this->t('Provide file extensions that support previewing and other image operations.'),
+    ];
+    $conf['advanced']['lazy_dimensions'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Lazy image dimensions'),
+      '#default_value' => $imce_profile->getConf('lazy_dimensions'),
       '#description' => $this->t(
-        'Files with these extensions will be treated as images. Leaving this field empty disables image handling, which may fix performance issues with folders containing too many images, especially under remote file systems like S3.'
+        'IMCE reads the width and height properties of images on the server side. This can be slow if too many images are loaded, especially on remote file systems such as S3. Enabling this option will calculate the dimensions on the client side during image preview.'
       ),
     ];
 

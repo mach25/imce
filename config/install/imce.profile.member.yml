@@ -15,6 +15,7 @@ conf:
   ignore_usage: false
   url_alter: false
   image_extensions: 'jpg jpeg png gif webp'
+  lazy_dimensions: false
   folders:
     -
       path: 'users/user[user:uid]'
