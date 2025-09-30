@@ -26,6 +26,11 @@
   min-width: auto;
 }
 
+.ck.ck-form .ck-imce-link-wrp > input.ck.ck-input {
+  flex-grow: 1;
+  min-width: auto;
+}
+
 .ck-imce-image-button::before,
 .ck-imce-link-button::before {
   display: inline-block;
