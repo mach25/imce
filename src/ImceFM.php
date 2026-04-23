@@ -680,7 +680,7 @@ class ImceFM {
     // Build only once.
     $regexp = &$this->conf['image_extensions_regexp'];
     if (!isset($regexp)) {
-      $exts = trim($this->getConf('image_extensions', 'jpg jpeg png gif webp'));
+      $exts = trim($this->getConf('image_extensions', 'jpg jpeg png gif webp avif'));
       $regexp = $exts ? '/\.(' . preg_replace('/ +/', '|', $exts) . ')$/i' : FALSE;
     }
     return $regexp;
